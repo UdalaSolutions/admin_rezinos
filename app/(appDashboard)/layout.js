@@ -12,26 +12,31 @@ export default function AdminLayout({ children }) {
 	const pathname = usePathname();
 	const router = useRouter();
 
-	// Check token validity
-	// useEffect(() => {
-	// 	const token = localStorage.getItem('authToken');
-	// 	if (!token) {
-	// 		router.replace('/signin');
-	// 		return;
-	// 	}
+	// Check token validity on mount
+	useEffect(() => {
+		const token = localStorage.getItem('authToken');
+		if (!token) {
+			router.replace('/');
+			return;
+		}
 
-	// 	try {
-	// 		const decoded = jwtDecode(token);
-	// 		// exp is in seconds
-	// 		if (decoded.exp * 1000 < Date.now()) {
-	// 			localStorage.removeItem('authToken');
-	// 			router.replace('/');
-	// 		}
-	// 	} catch {
-	// 		localStorage.removeItem('authToken');
-	// 		router.replace('/');
-	// 	}
-	// }, [router]);
+		try {
+			const decoded = jwtDecode(token);
+			// exp is in seconds
+			if (decoded.exp * 1000 < Date.now()) {
+				localStorage.removeItem('authToken');
+				router.replace('/');
+			}
+		} catch {
+			localStorage.removeItem('authToken');
+			router.replace('/');
+		}
+	}, [router]);
+
+	const handleLogout = () => {
+		localStorage.removeItem('authToken');
+		router.replace('/');
+	};
 
 	return (
 		<div className='flex h-screen bg-[#f3f3f3]'>
@@ -64,12 +69,11 @@ export default function AdminLayout({ children }) {
 								<Link
 									key={item.href}
 									href={item.href}
-									className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all group
-                    ${
-											isActive
-												? 'bg-pink-50 text-pink-600 font-medium border border-pink-100'
-												: 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-										}`}>
+									className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all group ${
+										isActive
+											? 'bg-pink-50 text-pink-600 font-medium border border-pink-100'
+											: 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+									}`}>
 									<Icon
 										icon={item.icon}
 										width='22'
@@ -126,10 +130,7 @@ export default function AdminLayout({ children }) {
 							</button>
 							<div className='w-px h-6 bg-gray-200'></div>
 							<button
-								onClick={() => {
-									localStorage.removeItem('authToken');
-									router.replace('/signin');
-								}}
+								onClick={handleLogout}
 								className='flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition text-sm font-medium'>
 								<Icon
 									icon='mdi:logout'

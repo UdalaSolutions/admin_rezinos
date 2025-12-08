@@ -1,56 +1,41 @@
 import axios from 'axios';
 import { API_CONFIG } from '@/app/config';
 
-const api = axios.create({
-	baseURL: API_CONFIG.BASE_URL,
-	headers: {
-		'Content-Type': 'application/json',
-	},
-});
+const getToken = () => {
+	if (typeof window === 'undefined') return null;
+	return localStorage.getItem('authToken');
+};
 
-// Attach token from localStorage to every request
-api.interceptors.request.use((config) => {
-	const token = localStorage.getItem('authToken');
-	if (token) {
-		config.headers.Authorization = `Bearer ${token}`;
-	}
-	return config;
-});
+export const getVideos = async () => {
+	const token = getToken();
 
-/**
- * Video Service
- */
-export const videoService = {
-	getVideos: async () => {
-		try {
-			const res = await api.get('/video/get-all');
-			return res.data;
-		} catch (err) {
-			if (err.response?.data?.message)
-				throw new Error(err.response.data.message);
-			throw new Error('Failed to fetch videos.');
+	const res = await axios.get(`${API_CONFIG.BASE_URL}/video/get-all`, {
+		headers: { Authorization: `Bearer ${token}` },
+	});
+
+	return res.data;
+};
+
+export const addVideo = async (videoData) => {
+	const token = getToken();
+
+	const res = await axios.post(
+		`${API_CONFIG.BASE_URL}/video/create`,
+		videoData,
+		{
+			headers: { Authorization: `Bearer ${token}` },
 		}
-	},
+	);
 
-	addVideo: async (video) => {
-		try {
-			const res = await api.post('/video/create', video);
-			return res.data;
-		} catch (err) {
-			if (err.response?.data?.message)
-				throw new Error(err.response.data.message);
-			throw new Error('Failed to add video.');
-		}
-	},
+	return res.data;
+};
 
-	deleteVideo: async (id) => {
-		try {
-			await api.delete(`/video/delete/${id}`);
-			return true;
-		} catch (err) {
-			if (err.response?.data?.message)
-				throw new Error(err.response.data.message);
-			throw new Error('Failed to delete video.');
-		}
-	},
+export const deleteVideo = async (id) => {
+	const token = getToken();
+
+	await axios.delete(`${API_CONFIG.BASE_URL}/video/delete/${id}`, {
+		headers: { Authorization: `Bearer ${token}` },
+	});
+
+	return true;
 };

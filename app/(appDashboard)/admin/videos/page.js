@@ -4,27 +4,27 @@ import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import CreateVideoModal from '@/app/components/admin/CreateVideoModal';
 import VideoCard from '@/app/components/admin/VideoCard';
-import { videoService } from '@/app/services/video';
+import { getVideos, addVideo, deleteVideo } from '@/app/services/video';
 
-export default function VideosPage({ userToken }) {
+export default function VideosPage() {
 	const [videos, setVideos] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 
-	// Set auth token and fetch videos
+	// Fetch videos on mount
 	useEffect(() => {
-		if (userToken) videoService.setAuthToken(userToken);
 		fetchVideos();
-	}, [userToken]);
+	}, []);
 
 	const fetchVideos = async () => {
 		setLoading(true);
 		setError('');
+
 		try {
-			const res = await videoService.getVideos();
-			setVideos(res.data?.videos || []);
+			const data = await getVideos();
+			setVideos(data?.videos || data || []);
 		} catch (err) {
 			console.error(err);
 			setError('Failed to fetch videos');
@@ -35,7 +35,7 @@ export default function VideosPage({ userToken }) {
 
 	const handleCreateVideo = async (video) => {
 		try {
-			const newVideo = await videoService.addVideo(video);
+			const newVideo = await addVideo(video);
 			setVideos((prev) => [newVideo, ...prev]);
 			setIsModalOpen(false);
 		} catch {
@@ -45,8 +45,9 @@ export default function VideosPage({ userToken }) {
 
 	const handleDeleteVideo = async (id) => {
 		if (!confirm('Delete this video?')) return;
+
 		try {
-			await videoService.deleteVideo(id);
+			await deleteVideo(id);
 			setVideos((prev) => prev.filter((v) => v.id !== id));
 		} catch {
 			alert('Failed to delete video');

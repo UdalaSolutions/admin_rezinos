@@ -1,50 +1,54 @@
 import axios from 'axios';
 import { API_CONFIG } from '@/app/config';
 
-const api = axios.create({
-	baseURL: API_CONFIG.BASE_URL,
-	headers: { 'Content-Type': 'application/json' },
-});
+const getToken = () => {
+	if (typeof window === 'undefined') return null;
+	return localStorage.getItem('authToken');
+};
 
-api.interceptors.request.use((config) => {
-	const token = localStorage.getItem('authToken');
-	if (token) config.headers.Authorization = `Bearer ${token}`;
-	return config;
-});
-
+//
+// AUTH
+//
 export const signIn = async (email, password) => {
-	try {
-		const response = await api.post('/login', { email, password });
-		const { token } = response.data;
+	const res = await axios.post(`${API_CONFIG.BASE_URL}/login`, {
+		email,
+		password,
+	});
+
+	const token = res.data?.data?.token;
+
+	if (token) {
 		localStorage.setItem('authToken', token);
-		return token;
-	} catch (error) {
-		const msg =
-			error.response?.data?.message || 'Sign in failed. Please try again.';
-		throw new Error(msg);
 	}
+
+	return token;
 };
 
 export const signOut = () => {
 	localStorage.removeItem('authToken');
 };
 
-export const getAuthToken = () => localStorage.getItem('authToken');
+export const getAuthToken = () => getToken();
 
+//
+// USERS
+//
 export const getAllUsers = async () => {
-	try {
-		const res = await api.get('/get-all');
-		return res.data.data.users || [];
-	} catch (error) {
-		throw new Error('Unable to fetch users');
-	}
+	const token = getToken();
+
+	const res = await axios.get(`${API_CONFIG.BASE_URL}/get-all`, {
+		headers: { Authorization: `Bearer ${token}` },
+	});
+
+	return res.data?.data?.users || [];
 };
 
 export const getUserById = async (id) => {
-	try {
-		const res = await api.get(`/get/${id}`);
-		return res.data.data;
-	} catch (error) {
-		throw new Error('Unable to fetch user');
-	}
+	const token = getToken();
+
+	const res = await axios.get(`${API_CONFIG.BASE_URL}/get/${id}`, {
+		headers: { Authorization: `Bearer ${token}` },
+	});
+
+	return res.data?.data || null;
 };

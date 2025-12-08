@@ -21,10 +21,14 @@ export default function SignInPage() {
 		setError('');
 
 		try {
-			await signIn(email, password);
+			const token = await signIn(email, password);
+
+			if (!token) throw new Error('Token not received');
+
+			// Token is already saved in localStorage by signIn()
 			router.push('/dashboard');
 		} catch (err) {
-			setError(err.message);
+			setError(err.message || 'Sign in failed');
 		} finally {
 			setIsLoading(false);
 		}
@@ -45,7 +49,7 @@ export default function SignInPage() {
 
 			{/* Form Section */}
 			<div className='flex-1 flex items-center justify-center p-8'>
-				<div className='max-w-md w-full bg-white '>
+				<div className='max-w-md w-full bg-white'>
 					<h2 className='text-3xl font-bold text-gray-900 mb-2'>
 						Welcome Back
 					</h2>
