@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
+import { toast } from 'react-toastify';
 import CreateVideoModal from '@/app/components/admin/CreateVideoModal';
+import DeleteVideoModal from '@/app/components/admin/Modal/DeleteVideoModal';
 import VideoCard from '@/app/components/admin/VideoCard';
 import { getVideos, addVideo, deleteVideo } from '@/app/services/video';
 
@@ -13,7 +15,9 @@ export default function VideosPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 
-	// Fetch videos on mount
+	const [videoToDelete, setVideoToDelete] = useState(null);
+	const [isDeleting, setIsDeleting] = useState(false);
+
 	useEffect(() => {
 		fetchVideos();
 	}, []);
@@ -23,8 +27,11 @@ export default function VideosPage() {
 		setError('');
 
 		try {
-			const data = await getVideos();
-			setVideos(data?.videos || data || []);
+			const res = await getVideos();
+			const videosArray = Array.isArray(res?.videos)
+				? res.videos
+				: res?.data?.videos || [];
+			setVideos(videosArray);
 		} catch (err) {
 			console.error(err);
 			setError('Failed to fetch videos');
@@ -35,22 +42,34 @@ export default function VideosPage() {
 
 	const handleCreateVideo = async (video) => {
 		try {
-			const newVideo = await addVideo(video);
-			setVideos((prev) => [newVideo, ...prev]);
+			await addVideo(video);
+			await fetchVideos();
 			setIsModalOpen(false);
 		} catch {
-			alert('Failed to add video');
+			toast.error('Failed to add video');
 		}
 	};
 
-	const handleDeleteVideo = async (id) => {
-		if (!confirm('Delete this video?')) return;
+	const openDeleteModal = (video) => {
+		setVideoToDelete(video);
+	};
+
+	const handleConfirmDelete = async () => {
+		if (!videoToDelete) return;
+
+		setIsDeleting(true);
 
 		try {
-			await deleteVideo(id);
-			setVideos((prev) => prev.filter((v) => v.id !== id));
-		} catch {
-			alert('Failed to delete video');
+			await deleteVideo(videoToDelete.id);
+			toast.success('Video deleted');
+			setVideoToDelete(null);
+			await fetchVideos();
+		} catch (err) {
+			console.error(err);
+			toast.error('Failed to delete video');
+			setVideoToDelete(null);
+		} finally {
+			setIsDeleting(false);
 		}
 	};
 
@@ -62,7 +81,6 @@ export default function VideosPage() {
 
 	return (
 		<div className='space-y-8'>
-			{/* Header */}
 			<div className='flex items-center justify-between'>
 				<div>
 					<h1 className='text-3xl font-bold text-gray-900'>Videos</h1>
@@ -79,7 +97,6 @@ export default function VideosPage() {
 				</button>
 			</div>
 
-			{/* Search */}
 			<div className='bg-white p-4 rounded-xl shadow-sm flex items-center gap-3'>
 				<Icon
 					icon='mdi:magnify'
@@ -95,29 +112,14 @@ export default function VideosPage() {
 				/>
 			</div>
 
-			{/* Content */}
 			{loading ? (
 				<div className='text-center py-16 bg-white rounded-xl shadow-sm'>
 					<Icon
 						icon='mdi:loading'
 						width='40'
-						className='mx-auto text-gray-400 animate-spin'
+						className='mx-auto animate-spin'
 					/>
 					<p className='mt-3 text-gray-600'>Loading videos...</p>
-				</div>
-			) : error ? (
-				<div className='text-center py-16 bg-white rounded-xl shadow-sm border border-red-200'>
-					<Icon
-						icon='mdi:alert-circle'
-						width='40'
-						className='mx-auto text-red-500'
-					/>
-					<p className='mt-3 text-red-600 font-medium'>{error}</p>
-					<button
-						onClick={fetchVideos}
-						className='mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition'>
-						Try Again
-					</button>
 				</div>
 			) : filteredVideos.length === 0 ? (
 				<div className='text-center py-16 bg-white rounded-xl shadow-sm'>
@@ -134,17 +136,24 @@ export default function VideosPage() {
 						<VideoCard
 							key={video.id}
 							video={video}
-							onDelete={handleDeleteVideo}
+							onDelete={() => openDeleteModal(video)}
 						/>
 					))}
 				</div>
 			)}
 
-			{/* Create Video Modal */}
 			{isModalOpen && (
 				<CreateVideoModal
 					onClose={() => setIsModalOpen(false)}
 					onSubmit={handleCreateVideo}
+				/>
+			)}
+
+			{videoToDelete && (
+				<DeleteVideoModal
+					onClose={() => setVideoToDelete(null)}
+					onConfirm={handleConfirmDelete}
+					isLoading={isDeleting}
 				/>
 			)}
 		</div>

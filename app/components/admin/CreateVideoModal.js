@@ -3,9 +3,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { predefinedCategories } from '@/utils/utils';
+import { toast } from 'react-toastify';
 
 export default function CreateVideoModal({ onClose, onSubmit }) {
-	const [formData, setFormData] = useState({ url: '', videoCategory: '' });
+	const [formData, setFormData] = useState({
+		url: '',
+		videoCategory: '',
+		title: '',
+		description: '',
+	});
 	const [categoryInput, setCategoryInput] = useState('');
 	const [showDropdown, setShowDropdown] = useState(false);
 	const dropdownRef = useRef(null);
@@ -49,15 +55,25 @@ export default function CreateVideoModal({ onClose, onSubmit }) {
 		setShowDropdown(false);
 	};
 
-	const handleSubmit = () => {
-		if (!formData.url.trim()) return alert('Enter video URL');
+	const handleSubmit = async () => {
+		if (!formData.url.trim()) return toast.error('Enter video URL');
+		if (!formData.title.trim()) return toast.error('Enter video title');
+		if (!formData.description.trim())
+			return toast.error('Enter video description');
 		if (!formData.videoCategory.trim())
-			return alert('Enter or select category');
+			return toast.error('Enter or select category');
 
 		setIsLoading(true);
-		onSubmit(formData);
-		setIsLoading(false);
-		onClose();
+
+		try {
+			await onSubmit(formData);
+			toast.success('Video created successfully');
+			onClose();
+		} catch {
+			toast.error('Failed to create video');
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const handleKeyPress = (e) => {
@@ -70,13 +86,13 @@ export default function CreateVideoModal({ onClose, onSubmit }) {
 	return (
 		<div className='fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4'>
 			<div className='bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden'>
-				{/* HEADER */}
 				<div className='relative px-6 py-5 border-b border-gray-100'>
 					<h2 className='text-2xl font-semibold text-gray-900 text-center'>
 						Add Video
 					</h2>
 					<button
 						onClick={onClose}
+						disabled={isLoading}
 						className='absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200'>
 						<Icon
 							icon='mdi:close'
@@ -85,9 +101,7 @@ export default function CreateVideoModal({ onClose, onSubmit }) {
 					</button>
 				</div>
 
-				{/* FORM */}
 				<div className='px-6 py-6 space-y-5'>
-					{/* Video URL */}
 					<div>
 						<label className='block text-sm font-medium text-gray-700 mb-2'>
 							Video URL
@@ -107,12 +121,40 @@ export default function CreateVideoModal({ onClose, onSubmit }) {
 								onKeyPress={handleKeyPress}
 								placeholder='https://www.youtube.com/watch?v=...'
 								className='w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all'
-								required
 							/>
 						</div>
 					</div>
 
-					{/* Category */}
+					<div>
+						<label className='block text-sm font-medium text-gray-700 mb-2'>
+							Title
+						</label>
+						<input
+							name='title'
+							type='text'
+							value={formData.title}
+							onChange={handleChange}
+							onKeyPress={handleKeyPress}
+							placeholder='Enter video title'
+							className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all'
+						/>
+					</div>
+
+					<div>
+						<label className='block text-sm font-medium text-gray-700 mb-2'>
+							Description
+						</label>
+						<textarea
+							name='description'
+							value={formData.description}
+							onChange={handleChange}
+							onKeyPress={handleKeyPress}
+							placeholder='Enter video description'
+							className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all resize-none'
+							rows={3}
+						/>
+					</div>
+
 					<div
 						ref={dropdownRef}
 						className='relative'>
@@ -133,11 +175,9 @@ export default function CreateVideoModal({ onClose, onSubmit }) {
 								onKeyPress={handleKeyPress}
 								placeholder='Search or type category'
 								className='w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all'
-								required
 							/>
 						</div>
 
-						{/* Dropdown */}
 						{showDropdown && (
 							<div className='absolute w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-10 overflow-hidden max-h-48 overflow-y-auto'>
 								{filteredCategories.map((cat) => (
@@ -172,14 +212,15 @@ export default function CreateVideoModal({ onClose, onSubmit }) {
 						)}
 					</div>
 
-					{/* ACTIONS */}
 					<div className='flex gap-3 pt-4'>
 						<button
 							type='button'
 							onClick={onClose}
+							disabled={isLoading}
 							className='flex-1 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition'>
 							Cancel
 						</button>
+
 						<button
 							onClick={handleSubmit}
 							disabled={isLoading}

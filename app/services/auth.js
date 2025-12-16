@@ -13,6 +13,7 @@ export const signIn = async (email, password) => {
 	const res = await axios.post(`${API_CONFIG.BASE_URL}/login`, {
 		email,
 		password,
+		userType: 'ADMIN', // always send ADMIN
 	});
 
 	const token = res.data?.data?.token;

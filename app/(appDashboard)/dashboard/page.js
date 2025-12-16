@@ -8,14 +8,6 @@ export default function AdminDashboard() {
 	return (
 		<div className='space-y-8'>
 			{/* Welcome Section */}
-			<div className='bg-white border border-gray-200 rounded-2xl p-8 shadow-sm'>
-				<h1 className='text-3xl font-bold text-gray-900 mb-2'>
-					Welcome back, Admin!
-				</h1>
-				<p className='text-gray-600'>
-					Here&apos;s what&apos;s happening with your platform today
-				</p>
-			</div>
 
 			{/* Stats Grid */}
 			<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
