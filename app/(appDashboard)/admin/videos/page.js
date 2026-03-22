@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'react-toastify';
-import CreateVideoModal from '@/app/components/admin/CreateVideoModal';
-import DeleteVideoModal from '@/app/components/admin/Modal/DeleteVideoModal';
-import VideoCard from '@/app/components/admin/VideoCard';
-import { getVideos, addVideo, deleteVideo } from '@/app/services/video';
+import CreateVideoModal from '../../../components/admin/CreateVideoModal';
+import DeleteVideoModal from '../../../components/admin/Modal/DeleteVideoModal';
+import VideoCard from '../../../components/admin/VideoCard';
+import { getVideos, addVideo, deleteVideo } from '../../../services/video';
 
 export default function VideosPage() {
 	const [videos, setVideos] = useState([]);
@@ -28,9 +28,8 @@ export default function VideosPage() {
 
 		try {
 			const res = await getVideos();
-			const videosArray = Array.isArray(res?.videos)
-				? res.videos
-				: res?.data?.videos || [];
+			const videosArray =
+				Array.isArray(res?.videos) ? res.videos : res?.data?.videos || [];
 			setVideos(videosArray);
 		} catch (err) {
 			console.error(err);
@@ -76,7 +75,7 @@ export default function VideosPage() {
 	const filteredVideos = videos.filter(
 		(v) =>
 			v.videoCategory?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			v.title?.toLowerCase().includes(searchQuery.toLowerCase())
+			v.title?.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
 
 	return (
@@ -112,7 +111,7 @@ export default function VideosPage() {
 				/>
 			</div>
 
-			{loading ? (
+			{loading ?
 				<div className='text-center py-16 bg-white rounded-xl shadow-sm'>
 					<Icon
 						icon='mdi:loading'
@@ -121,7 +120,7 @@ export default function VideosPage() {
 					/>
 					<p className='mt-3 text-gray-600'>Loading videos...</p>
 				</div>
-			) : filteredVideos.length === 0 ? (
+			: filteredVideos.length === 0 ?
 				<div className='text-center py-16 bg-white rounded-xl shadow-sm'>
 					<Icon
 						icon='mdi:video-off-outline'
@@ -130,8 +129,7 @@ export default function VideosPage() {
 					/>
 					<p className='mt-3 text-gray-600'>No videos found</p>
 				</div>
-			) : (
-				<div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'>
+			:	<div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'>
 					{filteredVideos.map((video) => (
 						<VideoCard
 							key={video.id}
@@ -140,7 +138,7 @@ export default function VideosPage() {
 						/>
 					))}
 				</div>
-			)}
+			}
 
 			{isModalOpen && (
 				<CreateVideoModal

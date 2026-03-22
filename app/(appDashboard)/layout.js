@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
-import { menuItems } from '@/utils/utils';
+import { menuItems } from '../../utils/utils';
 import { jwtDecode } from 'jwt-decode';
 
 export default function AdminLayout({ children }) {
@@ -67,17 +67,17 @@ export default function AdminLayout({ children }) {
 									key={item.href}
 									href={item.href}
 									className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all group ${
-										isActive
-											? 'bg-pink-50 text-pink-600 font-medium border border-pink-100'
-											: 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+										isActive ?
+											'bg-pink-50 text-pink-600 font-medium border border-pink-100'
+										:	'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
 									}`}>
 									<Icon
 										icon={item.icon}
 										width='22'
 										className={
-											isActive
-												? 'text-pink-600'
-												: 'text-gray-500 group-hover:text-gray-900'
+											isActive ? 'text-pink-600' : (
+												'text-gray-500 group-hover:text-gray-900'
+											)
 										}
 									/>
 									{isSidebarOpen && (

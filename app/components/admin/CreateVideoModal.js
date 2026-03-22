@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Icon } from '@iconify/react';
-import { predefinedCategories } from '@/utils/utils';
+import { predefinedCategories } from '../../../utils/utils';
 import { toast } from 'react-toastify';
 
 export default function CreateVideoModal({ onClose, onSubmit }) {
@@ -28,13 +28,13 @@ export default function CreateVideoModal({ onClose, onSubmit }) {
 	}, []);
 
 	const filteredCategories = predefinedCategories.filter((cat) =>
-		cat.toLowerCase().includes(categoryInput.toLowerCase())
+		cat.toLowerCase().includes(categoryInput.toLowerCase()),
 	);
 
 	const isNewCategory =
 		categoryInput &&
 		!predefinedCategories.some(
-			(cat) => cat.toLowerCase() === categoryInput.toLowerCase()
+			(cat) => cat.toLowerCase() === categoryInput.toLowerCase(),
 		);
 
 	const handleChange = (e) => {
@@ -225,7 +225,7 @@ export default function CreateVideoModal({ onClose, onSubmit }) {
 							onClick={handleSubmit}
 							disabled={isLoading}
 							className='flex-1 py-3 bg-linear-to-r from-pink-500 to-pink-600 text-white rounded-xl text-sm font-medium hover:from-pink-600 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm hover:shadow-md'>
-							{isLoading ? (
+							{isLoading ?
 								<span className='flex items-center justify-center gap-2'>
 									<Icon
 										icon='mdi:loading'
@@ -234,9 +234,7 @@ export default function CreateVideoModal({ onClose, onSubmit }) {
 									/>
 									Creating...
 								</span>
-							) : (
-								'Add Video'
-							)}
+							:	'Add Video'}
 						</button>
 					</div>
 				</div>

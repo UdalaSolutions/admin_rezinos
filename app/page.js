@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
-import { signIn } from '@/app/services/auth';
+import { signIn } from './services/auth';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -111,7 +111,7 @@ export default function SignInPage() {
 							type='submit'
 							disabled={isLoading}
 							className='w-full py-3 bg-linear-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:from-pink-600 hover:to-purple-700 transition shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'>
-							{isLoading ? (
+							{isLoading ?
 								<>
 									<Icon
 										icon='mdi:loading'
@@ -120,9 +120,7 @@ export default function SignInPage() {
 									/>
 									Signing in...
 								</>
-							) : (
-								'Sign In'
-							)}
+							:	'Sign In'}
 						</button>
 					</form>
 

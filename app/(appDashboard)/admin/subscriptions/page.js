@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
-import { subscriptionService } from '@/app/services/subscription';
-import { getUserById } from '@/app/services/auth';
-import Pagination from '@/app/components/admin/Pagination';
+import { subscriptionService } from '../../../services/subscription';
+import { getUserById } from '../../../services/auth';
+import Pagination from '../../../components/admin/Pagination';
 
 export default function SubscriptionsPage() {
 	const [subscriptions, setSubscriptions] = useState([]);
@@ -43,7 +43,7 @@ export default function SubscriptionsPage() {
 							},
 						};
 					}
-				})
+				}),
 			);
 
 			setEnrichedSubs(subsWithUsers);
@@ -66,7 +66,7 @@ export default function SubscriptionsPage() {
 		subscriptions.filter(
 			(s) =>
 				new Date(s.dateTheSubscriptionStarts) <= new Date() &&
-				new Date(s.dateTheSubscriptionEnd) >= new Date()
+				new Date(s.dateTheSubscriptionEnd) >= new Date(),
 		).length;
 
 	const getExpiringSoon = () =>
@@ -122,7 +122,7 @@ export default function SubscriptionsPage() {
 			</div>
 
 			{/* Loading / Error / Empty States */}
-			{loading ? (
+			{loading ?
 				<div className='text-center py-16 bg-white rounded-xl shadow-sm'>
 					<Icon
 						icon='mdi:loading'
@@ -131,7 +131,7 @@ export default function SubscriptionsPage() {
 					/>
 					<p className='mt-3 text-gray-600'>Loading subscriptions...</p>
 				</div>
-			) : error ? (
+			: error ?
 				<div className='text-center py-16 bg-white rounded-xl shadow-sm border border-red-200'>
 					<Icon
 						icon='mdi:alert-circle'
@@ -145,7 +145,7 @@ export default function SubscriptionsPage() {
 						Retry
 					</button>
 				</div>
-			) : enrichedSubs.length === 0 ? (
+			: enrichedSubs.length === 0 ?
 				<div className='text-center py-16 bg-white rounded-xl shadow-sm'>
 					<Icon
 						icon='mdi:inbox'
@@ -154,8 +154,7 @@ export default function SubscriptionsPage() {
 					/>
 					<p className='mt-3 text-gray-600'>No subscriptions found</p>
 				</div>
-			) : (
-				<>
+			:	<>
 					{/* Table */}
 					<div className='bg-white rounded-xl shadow-sm overflow-hidden'>
 						<div className='overflow-x-auto'>
@@ -234,15 +233,15 @@ export default function SubscriptionsPage() {
 												<td className='px-6 py-4'>
 													<span
 														className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-															isActive
-																? 'bg-green-100 text-green-700'
-																: 'bg-red-100 text-red-700'
+															isActive ?
+																'bg-green-100 text-green-700'
+															:	'bg-red-100 text-red-700'
 														}`}>
 														<Icon
 															icon={
-																isActive
-																	? 'mdi:check-circle'
-																	: 'mdi:close-circle'
+																isActive ? 'mdi:check-circle' : (
+																	'mdi:close-circle'
+																)
 															}
 															width='16'
 														/>
@@ -270,7 +269,7 @@ export default function SubscriptionsPage() {
 						onPageChange={setCurrentPage}
 					/>
 				</>
-			)}
+			}
 		</div>
 	);
 }

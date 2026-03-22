@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_CONFIG } from '@/app/config';
+import { API_CONFIG } from '../config';
 
 const getToken = () => {
 	if (typeof window === 'undefined') return null;
@@ -13,7 +13,7 @@ export const signIn = async (email, password) => {
 	const res = await axios.post(`${API_CONFIG.BASE_URL}/login`, {
 		email,
 		password,
-		userType: 'ADMIN', // always send ADMIN
+		userType: 'ADMIN',
 	});
 
 	const token = res.data?.data?.token;
@@ -30,6 +30,68 @@ export const signOut = () => {
 };
 
 export const getAuthToken = () => getToken();
+
+//
+// REGISTRATION FLOW
+//
+
+// Step 1: Send OTP to email (body is a raw JSON string e.g. "user@example.com")
+export const sendOtp = async (email) => {
+	const res = await axios.post(
+		`${API_CONFIG.BASE_URL}/otp/send`,
+		JSON.stringify(email),
+		{ headers: { 'Content-Type': 'application/json' } },
+	);
+	return res.data;
+};
+
+// Step 2: Verify OTP (query params)
+export const verifyOtp = async (email, code) => {
+	const res = await axios.post(`${API_CONFIG.BASE_URL}/otp/verify`, null, {
+		params: { recipient: email, code },
+	});
+	return res.data;
+};
+
+// Step 3: Register admin account
+export const registerAdmin = async ({
+	firstName,
+	lastName,
+	email,
+	password,
+}) => {
+	const res = await axios.post(`${API_CONFIG.BASE_URL}/register`, {
+		firstName,
+		lastName,
+		email,
+		password,
+		userType: 'ADMIN',
+	});
+	return res.data;
+};
+
+//
+// PASSWORD RESET FLOW
+//
+export const requestPasswordReset = async (email) => {
+	const res = await axios.post(
+		`${API_CONFIG.BASE_URL}/password/request`,
+		null,
+		{
+			params: { recipient: email },
+		},
+	);
+	return res.data;
+};
+
+export const resetPassword = async ({ email, code, newPassword }) => {
+	const res = await axios.post(`${API_CONFIG.BASE_URL}/password/reset`, {
+		email,
+		code,
+		newPassword,
+	});
+	return res.data;
+};
 
 //
 // USERS

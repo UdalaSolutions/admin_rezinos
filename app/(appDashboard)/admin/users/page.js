@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
-import { getAllUsers } from '@/app/services/auth';
-import UserDetailModal from '@/app/components/admin/Modal/UserDetailModal';
-import Pagination from '@/app/components/admin/Pagination';
+import { getAllUsers } from '../../../services/auth';
+import UserDetailModal from '../../../components/admin/Modal/UserDetailModal';
+import Pagination from '../../../components/admin/Pagination';
 
 export default function UsersPage() {
 	const [users, setUsers] = useState([]);
@@ -49,7 +49,7 @@ export default function UsersPage() {
 		(u) =>
 			u.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			u.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			u.email?.toLowerCase().includes(searchQuery.toLowerCase())
+			u.email?.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
 
 	// Pagination logic
@@ -117,7 +117,7 @@ export default function UsersPage() {
 			</div>
 
 			{/* Loading / Error / Empty States */}
-			{loading ? (
+			{loading ?
 				<div className='text-center py-16 bg-white rounded-xl shadow-sm'>
 					<Icon
 						icon='mdi:loading'
@@ -126,7 +126,7 @@ export default function UsersPage() {
 					/>
 					<p className='mt-3 text-gray-600'>Loading users...</p>
 				</div>
-			) : error ? (
+			: error ?
 				<div className='text-center py-16 bg-white rounded-xl shadow-sm border border-red-200'>
 					<Icon
 						icon='mdi:alert-circle'
@@ -140,7 +140,7 @@ export default function UsersPage() {
 						Retry
 					</button>
 				</div>
-			) : filteredUsers.length === 0 ? (
+			: filteredUsers.length === 0 ?
 				<div className='text-center py-16 bg-white rounded-xl shadow-sm'>
 					<Icon
 						icon='mdi:account-off-outline'
@@ -149,8 +149,7 @@ export default function UsersPage() {
 					/>
 					<p className='mt-3 text-gray-600'>No users found</p>
 				</div>
-			) : (
-				<>
+			:	<>
 					{/* Table */}
 					<div className='bg-white rounded-xl shadow-sm overflow-hidden'>
 						<div className='overflow-x-auto'>
@@ -199,7 +198,7 @@ export default function UsersPage() {
 											<td className='px-6 py-4'>
 												<span
 													className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(
-														user.role
+														user.role,
 													)}`}>
 													<Icon
 														icon='mdi:shield-account'
@@ -211,15 +210,15 @@ export default function UsersPage() {
 											<td className='px-6 py-4'>
 												<span
 													className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-														user.isActive
-															? 'bg-green-100 text-green-700'
-															: 'bg-gray-100 text-gray-700'
+														user.isActive ?
+															'bg-green-100 text-green-700'
+														:	'bg-gray-100 text-gray-700'
 													}`}>
 													<Icon
 														icon={
-															user.isActive
-																? 'mdi:check-circle'
-																: 'mdi:close-circle'
+															user.isActive ? 'mdi:check-circle' : (
+																'mdi:close-circle'
+															)
 														}
 														width='16'
 													/>
@@ -252,7 +251,7 @@ export default function UsersPage() {
 						onPageChange={setCurrentPage}
 					/>
 				</>
-			)}
+			}
 
 			{/* User Modal */}
 			<UserDetailModal

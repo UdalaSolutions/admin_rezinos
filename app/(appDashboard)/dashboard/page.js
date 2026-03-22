@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
-import { stats, recentActivities, quickActions } from '@/utils/utils';
+import { stats, recentActivities, quickActions } from '../../../utils/utils';
 
 export default function AdminDashboard() {
 	return (

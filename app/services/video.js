@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_CONFIG } from '@/app/config';
+import { API_CONFIG } from '../config';
 
 const getToken = () => {
 	if (typeof window === 'undefined') return null;
@@ -24,7 +24,7 @@ export const addVideo = async (videoData) => {
 		videoData,
 		{
 			headers: { Authorization: `Bearer ${token}` },
-		}
+		},
 	);
 
 	return res.data;
