@@ -28,7 +28,11 @@ export default function SignInPage() {
 			// Token is already saved in localStorage by signIn()
 			router.push('/dashboard');
 		} catch (err) {
-			setError(err.message || 'Sign in failed');
+			setError(
+				err.response?.data?.data ||
+					err.response?.data?.message ||
+					'Sign in failed',
+			);
 		} finally {
 			setIsLoading(false);
 		}
