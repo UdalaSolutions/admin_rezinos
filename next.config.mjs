@@ -4,7 +4,7 @@ const nextConfig = {
 		return [
 			{
 				source: '/api-proxy/:path*',
-				destination: 'https://rezinos-be.onrender.com/api/:path*',
+				destination: `${process.env.BACKEND_URL}/api/:path*`,
 			},
 		];
 	},

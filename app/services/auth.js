@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { API_CONFIG } from '../config';
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const getToken = () => {
 	if (typeof window === 'undefined') return null;
@@ -10,7 +11,7 @@ const getToken = () => {
 // AUTH
 //
 export const signIn = async (email, password) => {
-	const res = await axios.post(`${API_CONFIG.BASE_URL}/login`, {
+	const res = await axios.post(`${BASE_URL}/login`, {
 		email,
 		password,
 		userType: 'ADMIN',
@@ -37,17 +38,15 @@ export const getAuthToken = () => getToken();
 
 // Step 1: Send OTP to email (body is a raw JSON string e.g. "user@example.com")
 export const sendOtp = async (email) => {
-	const res = await axios.post(
-		`${API_CONFIG.BASE_URL}/otp/send`,
-		JSON.stringify(email),
-		{ headers: { 'Content-Type': 'application/json' } },
-	);
+	const res = await axios.post(`${BASE_URL}/otp/send`, JSON.stringify(email), {
+		headers: { 'Content-Type': 'application/json' },
+	});
 	return res.data;
 };
 
 // Step 2: Verify OTP (query params)
 export const verifyOtp = async (email, code) => {
-	const res = await axios.post(`${API_CONFIG.BASE_URL}/otp/verify`, null, {
+	const res = await axios.post(`${BASE_URL}/otp/verify`, null, {
 		params: { recipient: email, code },
 	});
 	return res.data;
@@ -60,7 +59,7 @@ export const registerAdmin = async ({
 	email,
 	password,
 }) => {
-	const res = await axios.post(`${API_CONFIG.BASE_URL}/register`, {
+	const res = await axios.post(`${BASE_URL}/register`, {
 		firstName,
 		lastName,
 		email,
@@ -74,18 +73,14 @@ export const registerAdmin = async ({
 // PASSWORD RESET FLOW
 //
 export const requestPasswordReset = async (email) => {
-	const res = await axios.post(
-		`${API_CONFIG.BASE_URL}/password/request`,
-		null,
-		{
-			params: { recipient: email },
-		},
-	);
+	const res = await axios.post(`${BASE_URL}/password/request`, null, {
+		params: { recipient: email },
+	});
 	return res.data;
 };
 
 export const resetPassword = async ({ email, code, newPassword }) => {
-	const res = await axios.post(`${API_CONFIG.BASE_URL}/password/reset`, {
+	const res = await axios.post(`${BASE_URL}/password/reset`, {
 		email,
 		code,
 		newPassword,
@@ -99,7 +94,7 @@ export const resetPassword = async ({ email, code, newPassword }) => {
 export const getAllUsers = async () => {
 	const token = getToken();
 
-	const res = await axios.get(`${API_CONFIG.BASE_URL}/get-all`, {
+	const res = await axios.get(`${BASE_URL}/get-all`, {
 		headers: { Authorization: `Bearer ${token}` },
 	});
 
@@ -109,7 +104,7 @@ export const getAllUsers = async () => {
 export const getUserById = async (id) => {
 	const token = getToken();
 
-	const res = await axios.get(`${API_CONFIG.BASE_URL}/get/${id}`, {
+	const res = await axios.get(`${BASE_URL}/get/${id}`, {
 		headers: { Authorization: `Bearer ${token}` },
 	});
 

@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { API_CONFIG } from '../config';
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const getToken = () => {
 	if (typeof window === 'undefined') return null;
@@ -9,7 +10,7 @@ const getToken = () => {
 export const getVideos = async () => {
 	const token = getToken();
 
-	const res = await axios.get(`${API_CONFIG.BASE_URL}/video/get-all`, {
+	const res = await axios.get(`${BASE_URL}/video/get-all`, {
 		headers: { Authorization: `Bearer ${token}` },
 	});
 
@@ -19,13 +20,9 @@ export const getVideos = async () => {
 export const addVideo = async (videoData) => {
 	const token = getToken();
 
-	const res = await axios.post(
-		`${API_CONFIG.BASE_URL}/video/create`,
-		videoData,
-		{
-			headers: { Authorization: `Bearer ${token}` },
-		},
-	);
+	const res = await axios.post(`${BASE_URL}/video/create`, videoData, {
+		headers: { Authorization: `Bearer ${token}` },
+	});
 
 	return res.data;
 };
@@ -33,7 +30,7 @@ export const addVideo = async (videoData) => {
 export const deleteVideo = async (id) => {
 	const token = getToken();
 
-	await axios.delete(`${API_CONFIG.BASE_URL}/video/delete/${id}`, {
+	await axios.delete(`${BASE_URL}/video/delete/${id}`, {
 		headers: { Authorization: `Bearer ${token}` },
 	});
 
