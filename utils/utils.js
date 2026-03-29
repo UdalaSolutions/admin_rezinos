@@ -15,11 +15,11 @@ export const predefinedCategories = [
 export const menuItems = [
 	{ name: 'Dashboard', href: '/dashboard', icon: 'mdi:view-dashboard-outline' },
 	{ name: 'Videos', href: '/admin/videos', icon: 'mdi:video-outline' },
-	{
-		name: 'Users',
-		href: '/admin/users',
-		icon: 'mdi:account-multiple-outline',
-	},
+	// {
+	// 	name: 'Users',
+	// 	href: '/admin/users',
+	// 	icon: 'mdi:account-multiple-outline',
+	// },
 	{
 		name: 'Subscriptions',
 		href: '/admin/subscriptions',
@@ -49,13 +49,13 @@ export const stats = [
 		icon: 'mdi:video-outline',
 		color: 'from-purple-500 to-purple-600',
 	},
-	{
-		title: 'Monthly Revenue',
-		value: '₦428,000',
-		change: '+23%',
-		icon: 'mdi:cash-multiple',
-		color: 'from-pink-500 to-pink-600',
-	},
+	// {
+	// 	title: 'Monthly Revenue',
+	// 	value: '₦428,000',
+	// 	change: '+23%',
+	// 	icon: 'mdi:cash-multiple',
+	// 	color: 'from-pink-500 to-pink-600',
+	// },
 ];
 
 export const recentActivities = [
@@ -101,13 +101,13 @@ export const quickActions = [
 		icon: 'mdi:video-outline',
 		color: 'from-pink-500 to-pink-600',
 	},
-	{
-		title: 'View Users',
-		description: 'Manage user accounts',
-		href: '/admin/users',
-		icon: 'mdi:account-multiple-outline',
-		color: 'from-blue-500 to-blue-600',
-	},
+	// {
+	// 	title: 'View Users',
+	// 	description: 'Manage user accounts',
+	// 	href: '/admin/users',
+	// 	icon: 'mdi:account-multiple-outline',
+	// 	color: 'from-blue-500 to-blue-600',
+	// },
 	{
 		title: 'Subscriptions',
 		description: 'View all subscriptions',
