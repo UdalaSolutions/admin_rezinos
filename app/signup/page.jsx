@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { sendOtp } from '../services/auth';
 
+const ALLOWED_EMAILS = ['admin@rezinos.com', 'gbenmoese788@gmail.com'];
+
 export default function SignUpPage() {
 	const router = useRouter();
 	const [form, setForm] = useState({
@@ -28,6 +30,11 @@ export default function SignUpPage() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setError('');
+
+		if (!ALLOWED_EMAILS.includes(form.email.trim().toLowerCase())) {
+			setError('You are not authorized to create an account.');
+			return;
+		}
 
 		if (form.password !== form.confirmPassword) {
 			setError('Passwords do not match');

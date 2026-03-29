@@ -3,12 +3,10 @@
 import { useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { subscriptionService } from '../../../services/subscription';
-import { getUserById } from '../../../services/auth';
 import Pagination from '../../../components/admin/Pagination';
 
 export default function SubscriptionsPage() {
 	const [subscriptions, setSubscriptions] = useState([]);
-	const [enrichedSubs, setEnrichedSubs] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 	const [currentPage, setCurrentPage] = useState(1);
@@ -20,33 +18,6 @@ export default function SubscriptionsPage() {
 		try {
 			const subs = await subscriptionService.getAllSubscriptions();
 			setSubscriptions(subs);
-
-			const subsWithUsers = await Promise.all(
-				subs.map(async (sub) => {
-					try {
-						const userData = await getUserById(sub.userId);
-						return {
-							...sub,
-							user: userData || {
-								email: 'Unknown',
-								firstName: 'Unknown',
-								lastName: 'User',
-							},
-						};
-					} catch {
-						return {
-							...sub,
-							user: {
-								email: 'Unknown',
-								firstName: 'Unknown',
-								lastName: 'User',
-							},
-						};
-					}
-				}),
-			);
-
-			setEnrichedSubs(subsWithUsers);
 		} catch (err) {
 			setError(err.message || 'Unable to fetch subscriptions');
 		} finally {
@@ -60,14 +31,13 @@ export default function SubscriptionsPage() {
 
 	const indexOfLastItem = currentPage * itemsPerPage;
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-	const currentSubs = enrichedSubs.slice(indexOfFirstItem, indexOfLastItem);
+	const currentSubs = subscriptions.slice(indexOfFirstItem, indexOfLastItem);
 
-	const getActiveCount = () =>
-		subscriptions.filter(
-			(s) =>
-				new Date(s.dateTheSubscriptionStarts) <= new Date() &&
-				new Date(s.dateTheSubscriptionEnd) >= new Date(),
-		).length;
+	const isActive = (sub) =>
+		new Date(sub.dateTheSubscriptionStarts) <= new Date() &&
+		new Date(sub.dateTheSubscriptionEnd) >= new Date();
+
+	const getActiveCount = () => subscriptions.filter(isActive).length;
 
 	const getExpiringSoon = () =>
 		subscriptions.filter((s) => {
@@ -76,6 +46,24 @@ export default function SubscriptionsPage() {
 				(1000 * 60 * 60 * 24);
 			return diff > 0 && diff <= 3;
 		}).length;
+
+	const formatDate = (dateStr) =>
+		new Date(dateStr).toLocaleDateString('en-US', {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric',
+		});
+
+	const formatPhone = (phone) => {
+		// Format Nigerian-style numbers or any raw phone string nicely
+		if (!phone) return '—';
+		const str = String(phone);
+		// e.g. 2349164361941 → +234 916 436 1941
+		if (str.startsWith('234') && str.length >= 13) {
+			return `+${str.slice(0, 3)} ${str.slice(3, 6)} ${str.slice(6, 9)} ${str.slice(9)}`;
+		}
+		return str;
+	};
 
 	return (
 		<div className='space-y-8'>
@@ -145,7 +133,7 @@ export default function SubscriptionsPage() {
 						Retry
 					</button>
 				</div>
-			: enrichedSubs.length === 0 ?
+			: subscriptions.length === 0 ?
 				<div className='text-center py-16 bg-white rounded-xl shadow-sm'>
 					<Icon
 						icon='mdi:inbox'
@@ -162,10 +150,7 @@ export default function SubscriptionsPage() {
 								<thead className='bg-gray-50 border-b border-gray-200'>
 									<tr>
 										<th className='px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'>
-											User
-										</th>
-										<th className='px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'>
-											Category
+											Phone Number
 										</th>
 										<th className='px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'>
 											Start Date
@@ -174,83 +159,73 @@ export default function SubscriptionsPage() {
 											End Date
 										</th>
 										<th className='px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'>
-											Status
+											Videos
 										</th>
 										<th className='px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'>
-											Plan ID
+											Status
 										</th>
 									</tr>
 								</thead>
 								<tbody className='divide-y divide-gray-200'>
 									{currentSubs.map((sub) => {
-										const isActive =
-											new Date(sub.dateTheSubscriptionEnd) > new Date();
-										const startDate = new Date(sub.dateTheSubscriptionStarts);
-										const endDate = new Date(sub.dateTheSubscriptionEnd);
+										const active = isActive(sub);
 
 										return (
 											<tr
 												key={sub.id}
 												className='hover:bg-gray-50 transition'>
+												{/* Phone Number */}
 												<td className='px-6 py-4'>
 													<div className='flex items-center gap-3'>
-														<div className='w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold'>
-															{sub.user?.firstName?.[0]?.toUpperCase() || 'U'}
+														<div className='w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semiboshrink-0'>
+															<Icon
+																icon='mdi:phone'
+																width='18'
+															/>
 														</div>
-														<div>
-															<p className='font-medium text-gray-900'>
-																{sub.user?.firstName} {sub.user?.lastName}
-															</p>
-															<p className='text-sm text-gray-500'>
-																{sub.user?.email}
-															</p>
-														</div>
+														<span className='font-mono text-sm text-gray-800 font-medium'>
+															{formatPhone(sub.userId)}
+														</span>
 													</div>
 												</td>
+
+												{/* Start Date */}
+												<td className='px-6 py-4 text-sm text-gray-700'>
+													{formatDate(sub.dateTheSubscriptionStarts)}
+												</td>
+
+												{/* End Date */}
+												<td className='px-6 py-4 text-sm text-gray-700'>
+													{formatDate(sub.dateTheSubscriptionEnd)}
+												</td>
+
+												{/* Number of Videos */}
 												<td className='px-6 py-4'>
-													<span className='inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium'>
+													<span className='inline-flex items-center gap-1.5 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium'>
 														<Icon
 															icon='mdi:video'
-															width='16'
+															width='15'
 														/>
-														{sub.videoCategory}
+														{sub.numberOfVideos ?? 0}{' '}
+														{sub.numberOfVideos === 1 ? 'video' : 'videos'}
 													</span>
 												</td>
-												<td className='px-6 py-4 text-sm text-gray-700'>
-													{startDate.toLocaleDateString('en-US', {
-														year: 'numeric',
-														month: 'short',
-														day: 'numeric',
-													})}
-												</td>
-												<td className='px-6 py-4 text-sm text-gray-700'>
-													{endDate.toLocaleDateString('en-US', {
-														year: 'numeric',
-														month: 'short',
-														day: 'numeric',
-													})}
-												</td>
+
+												{/* Status */}
 												<td className='px-6 py-4'>
 													<span
 														className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-															isActive ?
+															active ?
 																'bg-green-100 text-green-700'
 															:	'bg-red-100 text-red-700'
 														}`}>
 														<Icon
 															icon={
-																isActive ? 'mdi:check-circle' : (
-																	'mdi:close-circle'
-																)
+																active ? 'mdi:check-circle' : 'mdi:close-circle'
 															}
 															width='16'
 														/>
-														{isActive ? 'Active' : 'Expired'}
-													</span>
-												</td>
-												<td className='px-6 py-4'>
-													<span className='text-xs text-gray-500 font-mono'>
-														{sub.planId?.slice(0, 8)}...
+														{active ? 'Active' : 'Expired'}
 													</span>
 												</td>
 											</tr>
@@ -263,7 +238,7 @@ export default function SubscriptionsPage() {
 
 					{/* Pagination */}
 					<Pagination
-						totalItems={enrichedSubs.length}
+						totalItems={subscriptions.length}
 						itemsPerPage={itemsPerPage}
 						currentPage={currentPage}
 						onPageChange={setCurrentPage}

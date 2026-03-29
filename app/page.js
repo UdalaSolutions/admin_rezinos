@@ -7,6 +7,8 @@ import { signIn } from './services/auth';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+const ALLOWED_EMAILS = ['admin@rezinos.com', 'gbenmoese788@gmail.com'];
+
 export default function SignInPage() {
 	const router = useRouter();
 	const [email, setEmail] = useState('');
@@ -17,8 +19,14 @@ export default function SignInPage() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setIsLoading(true);
 		setError('');
+
+		if (!ALLOWED_EMAILS.includes(email.trim().toLowerCase())) {
+			setError('You are not authorized to access this portal.');
+			return;
+		}
+
+		setIsLoading(true);
 
 		try {
 			const token = await signIn(email, password);
@@ -130,7 +138,7 @@ export default function SignInPage() {
 
 					{/* Footer */}
 					<div className='mt-6 text-center text-sm text-gray-500'>
-						Don’t have an account?{' '}
+						Don&apos;t have an account?{' '}
 						<Link
 							href='/signup'
 							className='text-pink-500 hover:underline'>

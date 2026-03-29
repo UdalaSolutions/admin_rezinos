@@ -10,6 +10,11 @@ import { jwtDecode } from 'jwt-decode';
 export default function AdminLayout({ children }) {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
+	const [adminUser, setAdminUser] = useState({
+		firstName: '',
+		lastName: '',
+		email: '',
+	});
 
 	const pathname = usePathname();
 	const router = useRouter();
@@ -23,10 +28,19 @@ export default function AdminLayout({ children }) {
 
 		try {
 			const decoded = jwtDecode(token);
+
 			if (decoded.exp * 1000 < Date.now()) {
 				localStorage.removeItem('authToken');
 				router.replace('/');
+				return;
 			}
+
+			// Pull user info from the decoded JWT payload
+			setAdminUser({
+				firstName: decoded.firstName || decoded.given_name || '',
+				lastName: decoded.lastName || decoded.family_name || '',
+				email: decoded.email || decoded.sub || '',
+			});
 		} catch {
 			localStorage.removeItem('authToken');
 			router.replace('/');
@@ -37,6 +51,16 @@ export default function AdminLayout({ children }) {
 		localStorage.removeItem('authToken');
 		router.replace('/');
 	};
+
+	const fullName =
+		[adminUser.firstName, adminUser.lastName].filter(Boolean).join(' ') ||
+		'Admin';
+
+	const initials =
+		[adminUser.firstName?.[0], adminUser.lastName?.[0]]
+			.filter(Boolean)
+			.join('')
+			.toUpperCase() || 'A';
 
 	return (
 		<div className='flex h-screen bg-[#f3f3f3]'>
@@ -89,20 +113,21 @@ export default function AdminLayout({ children }) {
 					</nav>
 				</div>
 
+				{/* Profile trigger at bottom of sidebar */}
 				<div
 					onClick={() => setIsProfileOpen(true)}
 					className='p-4 border-t border-gray-200 cursor-pointer hover:bg-gray-50 transition'>
 					<div className='flex items-center gap-3 px-2 py-2'>
 						<div className='w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold shrink-0'>
-							A
+							{initials}
 						</div>
 						{isSidebarOpen && (
 							<div className='flex flex-col min-w-0'>
 								<p className='font-medium text-gray-900 text-sm truncate'>
-									Admin User
+									{fullName}
 								</p>
 								<p className='text-xs text-gray-500 truncate'>
-									admin@rezinos.com
+									{adminUser.email}
 								</p>
 							</div>
 						)}
@@ -113,9 +138,10 @@ export default function AdminLayout({ children }) {
 			<main className='flex-1 flex flex-col overflow-hidden'>
 				<header className='bg-white border-b border-gray-200 shrink-0'>
 					<div className='px-8 py-4 flex items-center justify-between'>
-						<div className=''>
+						<div>
 							<h1 className='text-lg font-bold text-gray-900 mb-2'>
-								Welcome back, Admin!
+								Welcome back
+								{adminUser.firstName ? `, ${adminUser.firstName}` : ''}!
 							</h1>
 							<p className='text-gray-600 text-sm'>
 								Here&apos;s what&apos;s happening with your platform today
@@ -135,6 +161,7 @@ export default function AdminLayout({ children }) {
 				<div className='p-8 overflow-y-auto flex-1 bg-gray-50'>{children}</div>
 			</main>
 
+			{/* Profile popup */}
 			{isProfileOpen && (
 				<div
 					className='fixed inset-0 z-50'
@@ -143,8 +170,8 @@ export default function AdminLayout({ children }) {
 						onClick={(e) => e.stopPropagation()}
 						className='absolute bottom-6 left-6 bg-white rounded-xl shadow-xl w-56 border border-gray-200'>
 						<div className='px-4 py-3 border-b border-gray-100'>
-							<p className='text-sm font-medium text-gray-900'>Admin User</p>
-							<p className='text-xs text-gray-500'>admin@rezinos.com</p>
+							<p className='text-sm font-medium text-gray-900'>{fullName}</p>
+							<p className='text-xs text-gray-500'>{adminUser.email}</p>
 						</div>
 
 						<button
