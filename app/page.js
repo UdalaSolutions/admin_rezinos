@@ -7,7 +7,7 @@ import { signIn } from './services/auth';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
-const ALLOWED_EMAILS = ['admin@rezinos.com', 'gbenmoese788@gmail.com'];
+const ALLOWED_EMAILS = ['admin@rezinos.com', 'gbenmoese788@gmail.com', 'techsupport@rezinos.com'];
 
 export default function SignInPage() {
 	const router = useRouter();
