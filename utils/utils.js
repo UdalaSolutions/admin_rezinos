@@ -1,15 +1,16 @@
 export const predefinedCategories = [
+	'acane',
 	'acne',
-	'anti-aging',
+	'antiaging',
 	'cleansing',
 	'hydration',
 	'moisturizing',
-	'sun-protection',
-	'morning-routine',
-	'night-routine',
-	'product-review',
+	'sunprotection',
+	'morningroutine',
+	'nightroutine',
+	'productreview',
 	'tutorial',
-	'diy-skincare',
+	'diyskincare',
 ];
 
 export const menuItems = [
