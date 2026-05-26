@@ -1,9 +1,22 @@
 import { Icon } from '@iconify/react';
 
 export default function VideoCard({ video, onDelete }) {
-	const embedUrl = video.url?.includes('youtube')
-		? video.url.replace('watch?v=', 'embed/')
-		: video.url;
+	const getEmbedUrl = (url) => {
+		if (!url) return null;
+		if (url.includes('youtube.com/shorts/')) {
+			const id = url.split('/shorts/')[1]?.split('?')[0];
+			return `https://www.youtube.com/embed/${id}`;
+		}
+		if (url.includes('watch?v=')) {
+			return url.replace('watch?v=', 'embed/');
+		}
+		if (url.includes('youtu.be/')) {
+			const id = url.split('youtu.be/')[1]?.split('?')[0];
+			return `https://www.youtube.com/embed/${id}`;
+		}
+		return url;
+	};
+	const embedUrl = getEmbedUrl(video.url);
 
 	return (
 		<div className='bg-white rounded-xl shadow-sm overflow-hidden flex flex-col'>
